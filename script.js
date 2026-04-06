@@ -229,7 +229,7 @@ function cacheDOMElements() {
   DOM.hiddenTruthContent = document.getElementById('hiddenTruthContent');
   DOM.harmfulList = document.getElementById('harmfulList');
   DOM.sugarOilContent = document.getElementById('sugarOilContent');
-  DOM.alternativesList = document.getElementById('alternativesList');
+
   DOM.btnBackToResult = document.getElementById('btnBackToResult');
   DOM.btnShareReport = document.getElementById('btnShareReport');
 
@@ -997,20 +997,6 @@ function populateReport(data) {
   // Sugar & Oil Warning
   DOM.sugarOilContent.innerHTML = `<p>${data.sugarOilWarning || 'No sugar or oil warnings.'}</p>`;
 
-  // Healthier Alternatives
-  const score = parseFloat(data.healthScore) || 5;
-  if (score < 7 && data.alternatives && data.alternatives.length > 0) {
-    // Strictly limit to 2 alternatives
-    const limitedAlts = data.alternatives.slice(0, 2);
-    DOM.alternativesList.innerHTML = limitedAlts.map(alt => `
-      <div class="alternative-item">
-        <i data-lucide="check-circle"></i>
-        <span>${alt}</span>
-      </div>
-    `).join('');
-  } else {
-    DOM.alternativesList.innerHTML = '<p style="color:var(--text-muted)">No alternatives needed or suggested.</p>';
-  }
 
   if (window.lucide) setTimeout(() => lucide.createIcons(), 50);
 }

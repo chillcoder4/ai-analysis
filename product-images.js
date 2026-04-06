@@ -246,85 +246,6 @@
     });
   }
 
-  // ==========================================
-  // ENHANCE ALTERNATIVES WITH IMAGES
-  // ==========================================
-  function enhanceAlternatives() {
-    const altList = document.getElementById('alternativesList');
-    if (!altList) return;
-
-    // Don't re-enhance
-    if (altList.querySelector('.ps-alt-img-grid')) return;
-
-    // Get alternative names from existing items
-    const items = altList.querySelectorAll('.alternative-item');
-    if (items.length === 0) return;
-
-    const alternatives = [];
-    items.forEach(item => {
-      const name = item.querySelector('span')?.textContent?.trim();
-      if (name) alternatives.push(name);
-    });
-
-    if (alternatives.length === 0) return;
-
-    // Build image card grid
-    const grid = document.createElement('div');
-    grid.className = 'ps-alt-img-grid';
-
-    alternatives.forEach((name, index) => {
-      const card = document.createElement('div');
-      card.className = 'ps-alt-img-card';
-      card.innerHTML = `
-        <div class="ps-alt-img-area">
-          <div class="ps-img-skeleton ps-img-skeleton-sm"><div class="ps-skeleton-shimmer"></div></div>
-        </div>
-        <div class="ps-alt-img-card-body">
-          <div class="ps-alt-img-card-name">${escapeText(name)}</div>
-          <span class="ps-alt-img-card-tag">
-            <i data-lucide="check-circle"></i> Healthier
-          </span>
-        </div>
-      `;
-      grid.appendChild(card);
-    });
-    
-    // Fetch images for alternatives simultaneously
-    alternatives.forEach((name, index) => {
-      const searchQuery = name;
-      fetchProductImage(searchQuery, 'alt').then(imgData => {
-        const imgArea = grid.querySelectorAll('.ps-alt-img-area')[index];
-        if (!imgArea) return;
-        
-        if (imgData && (imgData.imageUrl || imgData.thumbnailUrl)) {
-          const chain = buildFallbackChain(imgData.imageUrl, imgData.thumbnailUrl, { w: 300, h: 300 });
-
-          loadImageWithFallback(
-            chain,
-            name,
-            // onSuccess
-            (img) => {
-              imgArea.innerHTML = '';
-              imgArea.appendChild(img);
-            },
-            // onFail — show visible placeholder, never hide
-            () => {
-              imgArea.innerHTML = createPlaceholderHTML('Image blocked by source', true);
-            }
-          );
-        } else {
-          imgArea.innerHTML = createPlaceholderHTML('No image', true);
-        }
-      });
-    });
-
-    // Replace original text list with image grid
-    altList.innerHTML = '';
-    altList.appendChild(grid);
-
-    // Re-init lucide icons for the tags
-    if (window.lucide) setTimeout(() => lucide.createIcons(), 100);
-  }
 
   // ==========================================
   // ESCAPE HTML TEXT
@@ -349,28 +270,6 @@
       }).observe(resultScreen, { attributes: true, attributeFilter: ['class'] });
     }
 
-    // When report screen becomes active → enhance alternatives
-    const reportScreen = document.getElementById('reportScreen');
-    if (reportScreen) {
-      new MutationObserver(() => {
-        if (reportScreen.classList.contains('active')) {
-          setTimeout(enhanceAlternatives, 200);
-        }
-      }).observe(reportScreen, { attributes: true, attributeFilter: ['class'] });
-    }
-
-    // Also observe the alternatives list for content changes
-    // (because populateReport fills it dynamically)
-    const altList = document.getElementById('alternativesList');
-    if (altList) {
-      new MutationObserver(() => {
-        // Check if report screen is visible and list has content
-        const reportActive = reportScreen?.classList.contains('active');
-        if (reportActive && altList.children.length > 0 && !altList.querySelector('.ps-alt-img-grid')) {
-          setTimeout(enhanceAlternatives, 100);
-        }
-      }).observe(altList, { childList: true });
-    }
   }
 
   // ==========================================
