@@ -45,14 +45,11 @@ async function searchProduct(productName) {
   const keys = getSerperKeys();
   const errors = [];
 
-  // Smart query: if input contains a barcode, optimize the search
   const barcode = extractBarcode(productName);
-  let searchQuery;
+  // Optimized strictly to exactly ONE API call using combined query parameters. (No fallback)
+  const searchQuery = `${productName} food product ingredients nutrition brand details India`;
   if (barcode) {
-    searchQuery = `${barcode} food product ingredients nutrition brand details India packaged food label`;
     console.log(`[PureScan] Barcode detected: ${barcode}`);
-  } else {
-    searchQuery = `${productName} ingredients nutrition facts health analysis India`;
   }
 
   for (let i = 0; i < keys.length; i++) {
@@ -74,33 +71,6 @@ async function searchProduct(productName) {
       }
 
       const data = await response.json();
-
-      // If barcode search returned poor results, try a fallback query
-      if (barcode && data.organic && data.organic.length < 3) {
-        console.log('[PureScan] Few results for barcode, trying fallback query...');
-        try {
-          const fallbackRes = await fetch(SERPER_URL, {
-            method: 'POST',
-            headers: {
-              'X-API-KEY': keys[i],
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              q: `barcode ${barcode} product India`,
-              num: 8
-            })
-          });
-          if (fallbackRes.ok) {
-            const fallbackData = await fallbackRes.json();
-            if (fallbackData.organic) {
-              data.organic = [...(data.organic || []), ...fallbackData.organic];
-            }
-          }
-        } catch (e) {
-          // Ignore fallback errors
-        }
-      }
-
       return data;
     } catch (err) {
       errors.push(`Serper key ${i + 1}: ${err.message}`);
@@ -162,7 +132,10 @@ You MUST respond with ONLY valid JSON (no markdown, no code blocks, no extra tex
     }
   ],
   "sugarOilWarning": "Detailed paragraph about sugar content, types of oils/fats used, trans fats, and their health implications.",
-  "alternatives": ["Alternative product 1", "Alternative product 2", "Alternative product 3"],
+  "alternatives": [
+    "Array of EXACTLY 2 healthier brand/product alternatives ONLY if Health Score is between 0 and 6.",
+    "MUST return an empty array [] if Health Score is 7 to 10. Do not list alternatives for safe food."
+  ],
   "allergyAlerts": ["List any common allergens found like gluten, dairy, nuts, soy, etc."]
 }
 

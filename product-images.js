@@ -17,7 +17,7 @@
     const key = query.toLowerCase().trim();
     if (imageMemCache.has(key)) return imageMemCache.get(key);
     try {
-      const stored = JSON.parse(sessionStorage.getItem(IMAGE_CACHE_KEY) || '{}');
+      const stored = JSON.parse(localStorage.getItem(IMAGE_CACHE_KEY) || '{}');
       if (stored[key]) {
         imageMemCache.set(key, stored[key]);
         return stored[key];
@@ -30,26 +30,27 @@
     const key = query.toLowerCase().trim();
     imageMemCache.set(key, url);
     try {
-      const stored = JSON.parse(sessionStorage.getItem(IMAGE_CACHE_KEY) || '{}');
+      const stored = JSON.parse(localStorage.getItem(IMAGE_CACHE_KEY) || '{}');
       stored[key] = url;
       // Keep cache small (max 30 entries)
       const keys = Object.keys(stored);
       if (keys.length > 30) delete stored[keys[0]];
-      sessionStorage.setItem(IMAGE_CACHE_KEY, JSON.stringify(stored));
+      localStorage.setItem(IMAGE_CACHE_KEY, JSON.stringify(stored));
     } catch (e) {}
   }
 
   // ==========================================
   // FETCH IMAGE URL (via Netlify function)
   // ==========================================
-  async function fetchProductImage(query) {
+  async function fetchProductImage(query, type = 'main') {
+    const cacheKey = `${query}_${type}`;
     // Check cache first
-    const cached = getCachedImage(query);
+    const cached = getCachedImage(cacheKey);
     if (cached) return cached;
 
     try {
       const res = await fetch(
-        `/.netlify/functions/fetch-image?query=${encodeURIComponent(query)}`,
+        `/.netlify/functions/fetch-image?query=${encodeURIComponent(query)}&type=${encodeURIComponent(type)}`,
         { signal: AbortSignal.timeout(8000) }
       );
 
@@ -62,7 +63,7 @@
           imageUrl: data.imageUrl,
           thumbnailUrl: data.thumbnailUrl
         };
-        setCachedImage(query, resultArgs);
+        setCachedImage(cacheKey, resultArgs);
         return resultArgs;
       }
     } catch (e) {
@@ -70,120 +71,6 @@
     }
 
     return null;
-  }
-
-  // Load image with timeout — show emoji if image takes too long
-  function loadImageWithTimeout(imgWrap, url, altText, fallbackEmoji, timeoutMs) {
-    const tms = timeoutMs || 5000;
-    const img = new Image();
-    img.loading = 'lazy';
-    img.alt = altText;
-    img.referrerPolicy = 'no-referrer'; // Important for external image sources
-    img.className = 'ps-product-img';
-
-    let resolved = false;
-    const timer = setTimeout(() => {
-      if (!resolved) {
-        resolved = true;
-        imgWrap.innerHTML = `<div class="ps-img-placeholder">${fallbackEmoji}</div>`;
-      }
-    }, tms);
-
-    img.onload = () => {
-      if (!resolved) {
-        resolved = true;
-        clearTimeout(timer);
-        imgWrap.innerHTML = '';
-        imgWrap.appendChild(img);
-      }
-    };
-    img.onerror = () => {
-      if (!resolved) {
-        resolved = true;
-        clearTimeout(timer);
-        imgWrap.innerHTML = `<div class="ps-img-placeholder">${fallbackEmoji}</div>`;
-      }
-    };
-    img.src = url;
-  }
-
-  // ==========================================
-  // EMOJI HELPERS (smart fallback)
-  // ==========================================
-  function getProductEmoji(name) {
-    const n = (name || '').toLowerCase();
-    const map = [
-      [['noodle', 'maggi', 'yippee', 'pasta'], '🍜'],
-      [['cola', 'pepsi', 'thums up', 'sprite', 'mountain dew', 'soda', 'fanta'], '🥤'],
-      [['chip', 'lays', 'kurkure', 'bhujia', 'namkeen'], '🍟'],
-      [['chocolate', 'dairy milk', 'kitkat', 'oreo', 'nutella', 'cadbury'], '🍫'],
-      [['biscuit', 'cookie', 'parle', 'bourbon', 'good day', 'marie', 'hide'], '🍪'],
-      [['juice', 'frooti', 'maaza', 'real', 'tropicana', 'paper boat', 'tang'], '🧃'],
-      [['milk', 'dairy', 'amul'], '🥛'],
-      [['bread', 'pav'], '🍞'],
-      [['rice', 'biryani'], '🍚'],
-      [['tea', 'chai'], '🍵'],
-      [['coffee', 'nescafe'], '☕'],
-      [['butter', 'ghee'], '🧈'],
-      [['oil', 'saffola', 'fortune'], '🫒'],
-      [['sauce', 'ketchup', 'kissan', 'heinz'], '🥫'],
-      [['energy', 'sting', 'red bull', 'monster'], '⚡'],
-      [['horlicks', 'bournvita', 'complan', 'boost'], '🥤'],
-      [['ice cream', 'kulfi'], '🍨'],
-      [['candy', 'toffee', 'sweet'], '🍬'],
-      [['cereal', 'muesli', 'oats', 'cornflakes'], '🥣'],
-      [['honey'], '🍯'],
-      [['jam', 'jelly'], '🫙'],
-      [['paneer', 'cheese', 'tofu'], '🧀'],
-      [['egg'], '🥚'],
-      [['chicken', 'meat', 'fish'], '🍗'],
-      [['pickle', 'achar'], '🫙'],
-      [['chyawanprash'], '🍯'],
-      [['glucon', 'glucose'], '💊'],
-    ];
-    for (const [keywords, emoji] of map) {
-      if (keywords.some(k => n.includes(k))) return emoji;
-    }
-    return '📦';
-  }
-
-  function getFoodEmoji(name) {
-    const n = (name || '').toLowerCase();
-    const map = [
-      [['fruit', 'apple', 'banana', 'mango', 'papaya'], '🍎'],
-      [['salad', 'vegetable', 'veggie'], '🥗'],
-      [['nut', 'almond', 'walnut', 'peanut', 'cashew'], '🥜'],
-      [['coconut'], '🥥'],
-      [['orange', 'citrus', 'lemon'], '🍊'],
-      [['milk', 'curd', 'yogurt', 'dahi', 'lassi', 'buttermilk'], '🥛'],
-      [['egg', 'omelette'], '🥚'],
-      [['rice', 'grain', 'millet', 'ragi'], '🌾'],
-      [['honey'], '🍯'],
-      [['fish', 'salmon', 'tuna'], '🐟'],
-      [['chicken', 'meat', 'turkey'], '🍗'],
-      [['paneer', 'cheese', 'tofu', 'cottage'], '🧀'],
-      [['dry fruit', 'raisin', 'date', 'fig', 'prune'], '🫐'],
-      [['dal', 'lentil', 'bean', 'rajma', 'chana', 'chickpea', 'sprout'], '🫘'],
-      [['tea', 'green tea', 'herbal'], '🍵'],
-      [['oat', 'porridge', 'muesli', 'cereal'], '🥣'],
-      [['water', 'nimbu', 'lemonade'], '💧'],
-      [['jaggery', 'gur'], '🟤'],
-      [['avocado'], '🥑'],
-      [['broccoli', 'spinach', 'palak', 'kale'], '🥦'],
-      [['carrot', 'beetroot'], '🥕'],
-      [['sweet potato', 'potato'], '🍠'],
-      [['berry', 'strawberry', 'blueberry'], '🍓'],
-      [['smoothie', 'shake', 'protein'], '🥤'],
-      [['bread', 'whole wheat', 'multigrain'], '🍞'],
-      [['roti', 'chapati', 'paratha'], '🫓'],
-      [['soup'], '🍲'],
-      [['idli', 'dosa', 'uttapam'], '🫓'],
-      [['poha', 'upma'], '🍚'],
-    ];
-    for (const [keywords, emoji] of map) {
-      if (keywords.some(k => n.includes(k))) return emoji;
-    }
-    return '🥬';
   }
 
   // ==========================================
@@ -212,50 +99,33 @@
 
     // Fetch and display image
     const searchQuery = productName;
-    fetchProductImage(searchQuery).then(imgData => {
-      if (imgData) {
-        const fallbackEmoji = getProductEmoji(productName);
+    fetchProductImage(searchQuery, 'main').then(imgData => {
+      if (imgData && imgData.imageUrl) {
         const img = new Image();
         img.loading = 'lazy';
         img.alt = productName;
         img.referrerPolicy = 'no-referrer';
         img.className = 'ps-product-img';
 
-        let resolved = false;
-        let triedThumbnail = false;
-        
-        const timer = setTimeout(() => {
-          if (!resolved) {
-            resolved = true;
-            imgWrap.innerHTML = `<div class="ps-img-placeholder">${fallbackEmoji}</div>`;
-          }
-        }, 8000);
-
         img.onload = () => {
-          if (!resolved) {
-            resolved = true;
-            clearTimeout(timer);
-            imgWrap.innerHTML = '';
-            imgWrap.appendChild(img);
-          }
+          imgWrap.innerHTML = '';
+          imgWrap.appendChild(img);
         };
         
+        let triedThumb = false;
         img.onerror = () => {
-          if (!triedThumbnail && imgData.thumbnailUrl && imgData.thumbnailUrl !== imgData.imageUrl) {
-            triedThumbnail = true;
-            img.src = imgData.thumbnailUrl; // Direct Google CDN, no proxy!
-          } else if (!resolved) {
-            resolved = true;
-            clearTimeout(timer);
-            imgWrap.innerHTML = `<div class="ps-img-placeholder">${fallbackEmoji}</div>`;
+          if (!triedThumb && imgData.thumbnailUrl) {
+            triedThumb = true;
+            img.src = imgData.thumbnailUrl;
+          } else {
+            imgWrap.style.display = 'none';
           }
         };
         
-        // Start by trying the highest quality image via proxy
-        const targetUrl = imgData.imageUrl || imgData.thumbnailUrl;
-        img.src = `https://wsrv.nl/?url=${encodeURIComponent(targetUrl)}&w=800&fit=contain`;
+        // Direct frontend rendering natively bypassing proxies
+        img.src = imgData.imageUrl;
       } else {
-        imgWrap.innerHTML = `<div class="ps-img-placeholder">${getProductEmoji(productName)}</div>`;
+        imgWrap.style.display = 'none';
       }
     });
   }
@@ -286,7 +156,7 @@
     const grid = document.createElement('div');
     grid.className = 'ps-alt-img-grid';
 
-    alternatives.forEach(name => {
+    alternatives.forEach((name, index) => {
       const card = document.createElement('div');
       card.className = 'ps-alt-img-card';
       card.innerHTML = `
@@ -301,55 +171,43 @@
         </div>
       `;
       grid.appendChild(card);
-
-      // Fetch image for this alternative
+    });
+    
+    // Fetch image for alternatives simultaneously (2 calls)
+    alternatives.forEach((name, index) => {
       const searchQuery = name;
-      fetchProductImage(searchQuery).then(imgData => {
-        const imgArea = card.querySelector('.ps-alt-img-area');
-        if (imgData) {
-          const fallbackEmoji = getFoodEmoji(name);
+      fetchProductImage(searchQuery, 'alt').then(imgData => {
+        const imgArea = grid.querySelectorAll('.ps-alt-img-area')[index];
+        if (!imgArea) return;
+        
+        let targetUrl = imgData ? imgData.imageUrl : null;
+        let targetThumb = imgData ? imgData.thumbnailUrl : null;
+        
+        if (targetUrl) {
           const img = new Image();
           img.loading = 'lazy';
           img.alt = name;
           img.referrerPolicy = 'no-referrer';
 
-          let done = false;
-          let triedThumbnail = false;
-          
-          const fallback = () => {
-            if (!done) {
-              done = true;
-              imgArea.innerHTML = `<div class="ps-img-placeholder-mini">${fallbackEmoji}</div>`;
-            }
-          };
-          
-          // Show emoji if image takes > 8s
-          const timer = setTimeout(fallback, 8000);
-
           img.onload = () => {
-            if (!done) {
-              done = true;
-              clearTimeout(timer);
-              imgArea.innerHTML = '';
-              imgArea.appendChild(img);
-            }
+            imgArea.innerHTML = '';
+            imgArea.appendChild(img);
           };
           
+          let triedThumb = false;
           img.onerror = () => {
-            if (!triedThumbnail && imgData.thumbnailUrl && imgData.thumbnailUrl !== imgData.imageUrl) {
-              triedThumbnail = true;
-              img.src = imgData.thumbnailUrl; // Direct Google CDN, no proxy!
+            if (!triedThumb && targetThumb) {
+              triedThumb = true;
+              img.src = targetThumb;
             } else {
-              clearTimeout(timer);
-              fallback();
+              imgArea.innerHTML = '<div class="ps-img-error"><span>Image Blocked</span></div>';
             }
           };
           
-          // Start by trying the highest quality image via proxy
-          const targetUrl = imgData.imageUrl || imgData.thumbnailUrl;
-          img.src = `https://wsrv.nl/?url=${encodeURIComponent(targetUrl)}&w=400&fit=contain`;
+          // Direct frontend rendering natively
+          img.src = targetUrl;
         } else {
-          imgArea.innerHTML = `<div class="ps-img-placeholder-mini">${getFoodEmoji(name)}</div>`;
+          imgArea.innerHTML = '<div class="ps-img-error"><span>No Image</span></div>';
         }
       });
     });
@@ -422,6 +280,11 @@
     document.body.appendChild(marker);
 
     setupObservers();
+    
+    // Expose prefetch function for parallel loading
+    window.psPrefetchImage = function(query, type) {
+      if (query) fetchProductImage(query, type);
+    };
   }
 
   if (document.readyState === 'loading') {

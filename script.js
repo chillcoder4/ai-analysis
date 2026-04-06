@@ -750,53 +750,80 @@ async function startAnalysis() {
   resetLoadingUI();
 
   try {
-    // Step 1: Search product info via backend
-    updateLoadingStep(1, 'active', 30);
-    DOM.loadingStatus.textContent = t('fetchingData');
+    const cacheKey = AppState.productName.toLowerCase().trim();
+    let analysis = null;
 
-    // Call secure Netlify serverless function
-    const response = await fetch('/.netlify/functions/analyze-product', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ productName: AppState.productName })
-    });
-
-    updateLoadingStep(1, 'done', 50);
-
-    // Step 2: Process AI analysis
-    updateLoadingStep(2, 'active', 70);
-    DOM.loadingStatus.textContent = t('lStep2');
-
-    if (!response.ok) {
-      let errMsg = t('apiError');
-      try {
-        const errData = await response.json();
-        if (errData.error) errMsg = errData.error;
-      } catch (e) {
-        // If JSON parse fails, use default error
+    try {
+      const store = JSON.parse(localStorage.getItem('ps_analysis_cache') || '{}');
+      if (store[cacheKey]) {
+        analysis = store[cacheKey];
       }
-      throw new Error(errMsg);
+    } catch(e) {}
+
+    if (analysis) {
+      // CACHE HIT - Skip API calls
+      updateLoadingStep(1, 'done', 50);
+      updateLoadingStep(2, 'done', 80);
+      await sleep(400); // UX smoothing
+      updateLoadingStep(3, 'active', 90);
+      DOM.loadingStatus.textContent = t('lStep3');
+    } else {
+      // CACHE MISS - Full API Flow
+      // Step 1: Search product info via backend
+      updateLoadingStep(1, 'active', 30);
+      DOM.loadingStatus.textContent = t('fetchingData');
+
+      // Call secure Netlify serverless function
+      const response = await fetch('/.netlify/functions/analyze-product', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productName: AppState.productName })
+      });
+
+      updateLoadingStep(1, 'done', 50);
+
+      // Step 2: Process AI analysis
+      updateLoadingStep(2, 'active', 70);
+      DOM.loadingStatus.textContent = t('lStep2');
+
+      if (!response.ok) {
+        let errMsg = t('apiError');
+        try {
+          const errData = await response.json();
+          if (errData.error) errMsg = errData.error;
+        } catch (e) {}
+        throw new Error(errMsg);
+      }
+
+      analysis = await response.json();
+
+      if (!analysis || !analysis.healthScore) {
+        throw new Error(t('apiError'));
+      }
+
+      // Check if the product is food-related
+      if (analysis.isFood === false) {
+        showError(analysis.shortSummary || 'This product is not a food-related item. Please scan only food products for analysis.');
+        navigateTo('inputScreen');
+        AppState.isAnalyzing = false;
+        return;
+      }
+
+      // Save to Cache
+      try {
+        const store = JSON.parse(localStorage.getItem('ps_analysis_cache') || '{}');
+        store[cacheKey] = analysis;
+        const keys = Object.keys(store);
+        if (keys.length > 50) delete store[keys[0]]; // Max 50 items
+        localStorage.setItem('ps_analysis_cache', JSON.stringify(store));
+      } catch(e) {}
+
+      updateLoadingStep(2, 'done', 80);
+
+      // Step 3: Calculate & display
+      updateLoadingStep(3, 'active', 90);
+      DOM.loadingStatus.textContent = t('lStep3');
     }
-
-    const analysis = await response.json();
-
-    if (!analysis || !analysis.healthScore) {
-      throw new Error(t('apiError'));
-    }
-
-    // Check if the product is food-related
-    if (analysis.isFood === false) {
-      showError(analysis.shortSummary || 'This product is not a food-related item. Please scan only food products for analysis.');
-      navigateTo('inputScreen');
-      AppState.isAnalyzing = false;
-      return;
-    }
-
-    updateLoadingStep(2, 'done', 80);
-
-    // Step 3: Calculate & display
-    updateLoadingStep(3, 'active', 90);
-    DOM.loadingStatus.textContent = t('lStep3');
 
     await sleep(600); // Brief pause for UX
     updateLoadingStep(3, 'done', 100);
@@ -971,15 +998,18 @@ function populateReport(data) {
   DOM.sugarOilContent.innerHTML = `<p>${data.sugarOilWarning || 'No sugar or oil warnings.'}</p>`;
 
   // Healthier Alternatives
-  if (data.alternatives && data.alternatives.length > 0) {
-    DOM.alternativesList.innerHTML = data.alternatives.map(alt => `
+  const score = parseFloat(data.healthScore) || 5;
+  if (score < 7 && data.alternatives && data.alternatives.length > 0) {
+    // Strictly limit to 2 alternatives
+    const limitedAlts = data.alternatives.slice(0, 2);
+    DOM.alternativesList.innerHTML = limitedAlts.map(alt => `
       <div class="alternative-item">
         <i data-lucide="check-circle"></i>
         <span>${alt}</span>
       </div>
     `).join('');
   } else {
-    DOM.alternativesList.innerHTML = '<p style="color:var(--text-muted)">No alternatives suggested.</p>';
+    DOM.alternativesList.innerHTML = '<p style="color:var(--text-muted)">No alternatives needed or suggested.</p>';
   }
 
   if (window.lucide) setTimeout(() => lucide.createIcons(), 50);

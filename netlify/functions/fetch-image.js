@@ -30,25 +30,16 @@ exports.handler = async function (event) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'Query required' }) };
   }
 
+  const type = event.queryStringParameters?.type || 'main';
   const rawQuery = query.trim().substring(0, 200);
-  const lowerQuery = rawQuery.toLowerCase();
   const keys = getSerperKeys();
 
-  // Intelligent Query System — Enforcing Human-Clicked Real Photos
   let searchTerms = rawQuery;
-  if (lowerQuery.includes('juice')) {
-    searchTerms += ' juice bottle real user photo taken by phone';
-  } else if (lowerQuery.includes('biscuit') || lowerQuery.includes('cookie')) {
-    searchTerms += ' biscuit packet real consumer photo mobile camera';
-  } else if (lowerQuery.includes('snack') || lowerQuery.includes('chips')) {
-    searchTerms += ' snack packet real life photo in hand';
-  } else if (lowerQuery.includes('fruit') || lowerQuery.includes('apple') || lowerQuery.includes('banana')) {
-    searchTerms += ' fresh fruits real unedited photo';
+  if (type === 'alt') {
+    searchTerms = `${rawQuery} product front view real photo`;
   } else {
-    searchTerms += ' product packaging real life user picture taken by phone';
+    searchTerms = `${rawQuery} product packaging front view real photo`;
   }
-
-  const fallbackSearchTerms = rawQuery + ' real product photo consumer review mobile picture';
 
   async function fetchImagesForQuery(q) {
     for (let i = 0; i < keys.length; i++) {
@@ -85,11 +76,11 @@ exports.handler = async function (event) {
       
       if (url.startsWith('data:')) return false;
       
-      // Strict size > 400px
+      // Strict size > 300px
       const width = img.imageWidth || 0;
       const height = img.imageHeight || 0;
-      if (width > 0 && width < 400) return false;
-      if (height > 0 && height < 400) return false;
+      if (width > 0 && width <= 300) return false;
+      if (height > 0 && height <= 300) return false;
       
       return true;
     });
@@ -101,15 +92,8 @@ exports.handler = async function (event) {
     });
   }
 
-  // Attempt 1: Intelligent Query
   let rawImages = await fetchImagesForQuery(searchTerms);
   let bestImages = filterAndSort(rawImages);
-
-  // Attempt 2: Fallback Strategy
-  if (bestImages.length === 0) {
-    rawImages = await fetchImagesForQuery(fallbackSearchTerms);
-    bestImages = filterAndSort(rawImages);
-  }
 
   if (bestImages.length > 0) {
     const primary = bestImages[0];
