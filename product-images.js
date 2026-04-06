@@ -2,13 +2,119 @@
    PureScan — Product Images Module
    Fetches and displays product images dynamically
    Uses existing Serper API via Netlify function
+   + wsrv.nl proxy for hotlink-safe rendering
    ============================================= */
 
 (function () {
   'use strict';
 
   // ==========================================
-  // IMAGE CACHE (in-memory + sessionStorage)
+  // IMAGE PROXY & WRAPPER
+  // ==========================================
+
+  /**
+   * Wrap a raw image URL through wsrv.nl proxy CDN
+   * to bypass hotlinking / CORS restrictions.
+   * @param {string} url  — raw image URL
+   * @param {object} opts — optional sizing: { w, h, fit }
+   * @returns {string} proxied URL
+   */
+  function proxyUrl(url, opts = {}) {
+    if (!url) return '';
+    // Don't double-proxy
+    if (url.includes('wsrv.nl')) return url;
+    // Skip data URIs
+    if (url.startsWith('data:')) return url;
+
+    const w = opts.w || 400;
+    const h = opts.h || 400;
+    const fit = opts.fit || 'cover';
+    // wsrv.nl accepts raw URL — no encodeURIComponent needed
+    return `https://wsrv.nl/?url=${url}&w=${w}&h=${h}&fit=${fit}&n=-1`;
+  }
+
+  /**
+   * Build a multi-source fallback chain for an image.
+   * Order: proxy → original → thumbnail proxy → thumbnail → null
+   */
+  function buildFallbackChain(imageUrl, thumbnailUrl, opts = {}) {
+    const chain = [];
+    if (imageUrl) {
+      chain.push(proxyUrl(imageUrl, opts));   // 1. proxied full image
+      chain.push(imageUrl);                    // 2. original full image
+    }
+    if (thumbnailUrl) {
+      chain.push(proxyUrl(thumbnailUrl, opts)); // 3. proxied thumbnail
+      chain.push(thumbnailUrl);                  // 4. original thumbnail
+    }
+    console.log('[ProductImages] Fallback chain:', chain);
+    return chain;
+  }
+
+  /**
+   * Load an image through a fallback chain.
+   * Tries each source in order; calls onSuccess(img) or onFail().
+   */
+  function loadImageWithFallback(chain, altText, onSuccess, onFail) {
+    let index = 0;
+    let settled = false;
+
+    // Safety timeout — if nothing loads in 15s, show placeholder
+    const safetyTimer = setTimeout(() => {
+      if (!settled) {
+        settled = true;
+        console.warn('[ProductImages] Safety timeout — no image loaded in 15s');
+        if (onFail) onFail();
+      }
+    }, 15000);
+
+    function tryNext() {
+      if (settled) return;
+      if (index >= chain.length) {
+        settled = true;
+        clearTimeout(safetyTimer);
+        console.warn('[ProductImages] All sources exhausted');
+        if (onFail) onFail();
+        return;
+      }
+
+      const currentSrc = chain[index];
+      console.log(`[ProductImages] Trying source ${index + 1}/${chain.length}:`, currentSrc);
+
+      const img = new Image();
+      img.alt = altText || 'Product';
+      img.referrerPolicy = 'no-referrer';
+
+      img.onload = () => {
+        if (settled) return;
+        console.log(`[ProductImages] ✅ Loaded (${img.naturalWidth}x${img.naturalHeight}):`, currentSrc);
+        // Verify it's not a tiny tracking pixel
+        if (img.naturalWidth < 10 || img.naturalHeight < 10) {
+          console.warn('[ProductImages] Skipping tracking pixel');
+          index++;
+          tryNext();
+          return;
+        }
+        settled = true;
+        clearTimeout(safetyTimer);
+        if (onSuccess) onSuccess(img);
+      };
+
+      img.onerror = () => {
+        if (settled) return;
+        console.warn(`[ProductImages] ❌ Failed source ${index + 1}:`, currentSrc);
+        index++;
+        tryNext();
+      };
+
+      img.src = currentSrc;
+    }
+
+    tryNext();
+  }
+
+  // ==========================================
+  // IMAGE CACHE (in-memory + localStorage)
   // ==========================================
   const IMAGE_CACHE_KEY = 'purescan_img_cache';
   const imageMemCache = new Map();
@@ -74,6 +180,23 @@
   }
 
   // ==========================================
+  // PLACEHOLDER / ERROR HTML GENERATORS
+  // ==========================================
+  function createPlaceholderHTML(message, isMini = false) {
+    const sizeClass = isMini ? 'ps-img-placeholder-block--mini' : '';
+    return `
+      <div class="ps-img-placeholder-block ${sizeClass}">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <polyline points="21 15 16 10 5 21"/>
+        </svg>
+        <span>${escapeText(message)}</span>
+      </div>`;
+  }
+
+  // ==========================================
   // INJECT PRODUCT IMAGE INTO RESULT SCREEN
   // ==========================================
   function injectProductImage() {
@@ -100,32 +223,25 @@
     // Fetch and display image
     const searchQuery = productName;
     fetchProductImage(searchQuery, 'main').then(imgData => {
-      if (imgData && imgData.imageUrl) {
-        const img = new Image();
-        img.loading = 'lazy';
-        img.alt = productName;
-        img.referrerPolicy = 'no-referrer';
-        img.className = 'ps-product-img';
+      if (imgData && (imgData.imageUrl || imgData.thumbnailUrl)) {
+        const chain = buildFallbackChain(imgData.imageUrl, imgData.thumbnailUrl, { w: 400, h: 400 });
 
-        img.onload = () => {
-          imgWrap.innerHTML = '';
-          imgWrap.appendChild(img);
-        };
-        
-        let triedThumb = false;
-        img.onerror = () => {
-          if (!triedThumb && imgData.thumbnailUrl) {
-            triedThumb = true;
-            img.src = imgData.thumbnailUrl;
-          } else {
-            imgWrap.style.display = 'none';
+        loadImageWithFallback(
+          chain,
+          productName,
+          // onSuccess
+          (img) => {
+            img.className = 'ps-product-img';
+            imgWrap.innerHTML = '';
+            imgWrap.appendChild(img);
+          },
+          // onFail — show placeholder, never hide
+          () => {
+            imgWrap.innerHTML = createPlaceholderHTML('Image blocked by source');
           }
-        };
-        
-        // Direct frontend rendering natively bypassing proxies
-        img.src = imgData.imageUrl;
+        );
       } else {
-        imgWrap.style.display = 'none';
+        imgWrap.innerHTML = createPlaceholderHTML('No image available');
       }
     });
   }
@@ -173,41 +289,31 @@
       grid.appendChild(card);
     });
     
-    // Fetch image for alternatives simultaneously (2 calls)
+    // Fetch images for alternatives simultaneously
     alternatives.forEach((name, index) => {
       const searchQuery = name;
       fetchProductImage(searchQuery, 'alt').then(imgData => {
         const imgArea = grid.querySelectorAll('.ps-alt-img-area')[index];
         if (!imgArea) return;
         
-        let targetUrl = imgData ? imgData.imageUrl : null;
-        let targetThumb = imgData ? imgData.thumbnailUrl : null;
-        
-        if (targetUrl) {
-          const img = new Image();
-          img.loading = 'lazy';
-          img.alt = name;
-          img.referrerPolicy = 'no-referrer';
+        if (imgData && (imgData.imageUrl || imgData.thumbnailUrl)) {
+          const chain = buildFallbackChain(imgData.imageUrl, imgData.thumbnailUrl, { w: 300, h: 300 });
 
-          img.onload = () => {
-            imgArea.innerHTML = '';
-            imgArea.appendChild(img);
-          };
-          
-          let triedThumb = false;
-          img.onerror = () => {
-            if (!triedThumb && targetThumb) {
-              triedThumb = true;
-              img.src = targetThumb;
-            } else {
-              imgArea.innerHTML = '<div class="ps-img-error"><span>Image Blocked</span></div>';
+          loadImageWithFallback(
+            chain,
+            name,
+            // onSuccess
+            (img) => {
+              imgArea.innerHTML = '';
+              imgArea.appendChild(img);
+            },
+            // onFail — show visible placeholder, never hide
+            () => {
+              imgArea.innerHTML = createPlaceholderHTML('Image blocked by source', true);
             }
-          };
-          
-          // Direct frontend rendering natively
-          img.src = targetUrl;
+          );
         } else {
-          imgArea.innerHTML = '<div class="ps-img-error"><span>No Image</span></div>';
+          imgArea.innerHTML = createPlaceholderHTML('No image', true);
         }
       });
     });
@@ -285,6 +391,9 @@
     window.psPrefetchImage = function(query, type) {
       if (query) fetchProductImage(query, type);
     };
+
+    // Expose proxyUrl globally for any other modules that need it
+    window.psProxyUrl = proxyUrl;
   }
 
   if (document.readyState === 'loading') {
