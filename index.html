@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PureScan — Listen to Science, Not Marketing</title>
+  <meta name="description" content="PureScan exposes the hidden truth behind food labels. Scan any product, get AI-powered health analysis, and make smarter dietary choices.">
+  <meta name="keywords" content="food scanner, ingredient analysis, health rating, nutrition, pure scan, food safety">
+  <meta name="theme-color" content="#0a0a1a">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <!-- Html5-QrCode Barcode Scanner -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+  <link rel="stylesheet" href="style.css?v=7">
+  <link rel="stylesheet" href="health-modules.css?v=7">
+  <link rel="stylesheet" href="product-images.css?v=7">
+</head>
+<body>
+
+  <!-- ===== THEME TOGGLE ===== -->
+  <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+    <i data-lucide="moon" class="theme-icon-dark"></i>
+    <i data-lucide="sun" class="theme-icon-light"></i>
+  </button>
+
+  <!-- ===== ABOUT BUTTON ===== -->
+  <button id="aboutToggle" class="about-toggle" aria-label="About PureScan">
+    <i data-lucide="info"></i>
+  </button>
+
+  <!-- ===== LANGUAGE TOGGLE ===== -->
+  <button id="langToggle" class="lang-toggle" aria-label="Toggle language">
+    <span id="langLabel">EN</span>
+  </button>
+
+  <!-- ===== SCREEN 1: SPLASH / LANDING ===== -->
+  <section id="splashScreen" class="screen active">
+    <div class="splash-container">
+      <div class="splash-glow"></div>
+      <div class="logo-wrapper">
+        <div class="logo-icon">
+          <i data-lucide="scan-eye" class="logo-lucide"></i>
+        </div>
+        <h1 class="logo-text">Pure<span class="logo-accent">Scan</span></h1>
+        <p class="tagline" data-i18n="tagline">PROTOTYPE <br> Listen to Science, Not Marketing.</p>
+      </div>
+      <p class="splash-desc" data-i18n="splashDesc">Exposing the truth behind misleading food labels and empowering every household to make smarter, healthier decisions.</p>
+      <button id="btnStartScanning" class="btn btn-primary btn-glow" data-i18n="startScanning">
+        <i data-lucide="arrow-right"></i>
+        Start Scanning
+      </button>
+      <div class="splash-stats">
+        <div class="stat-item">
+          <span class="stat-num">10K+</span>
+          <span class="stat-label" data-i18n="productsScanned">Products Scanned</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">95%</span>
+          <span class="stat-label" data-i18n="accuracy">Accuracy</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">4.8★</span>
+          <span class="stat-label" data-i18n="userRating">User Rating</span>
+        </div>
+      </div>
+    </div>
+    <div class="splash-bg-orbs">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN 2: HOW IT WORKS ===== -->
+  <section id="howItWorksScreen" class="screen">
+    <div class="screen-content">
+      <button class="btn-back" data-target="splashScreen" aria-label="Go back">
+        <i data-lucide="arrow-left"></i>
+      </button>
+      <h2 class="section-title" data-i18n="howItWorks">How It Works</h2>
+      <p class="section-sub" data-i18n="howItWorksSub">Three simple steps to uncover the truth</p>
+
+      <div class="steps-container">
+        <div class="step-card glass-card" style="--delay: 0.1s">
+          <div class="step-icon step-icon-1">
+            <i data-lucide="scan-line"></i>
+          </div>
+          <div class="step-number">01</div>
+          <h3 data-i18n="step1Title">Scan Barcode</h3>
+          <p data-i18n="step1Desc">Scan a product barcode using your camera or type the product name to begin analysis.</p>
+        </div>
+        <div class="step-card glass-card" style="--delay: 0.2s">
+          <div class="step-icon step-icon-2">
+            <i data-lucide="brain"></i>
+          </div>
+          <div class="step-number">02</div>
+          <h3 data-i18n="step2Title">AI Analyzes</h3>
+          <p data-i18n="step2Desc">Our AI decodes every ingredient, chemical, and hidden additive in seconds.</p>
+        </div>
+        <div class="step-card glass-card" style="--delay: 0.3s">
+          <div class="step-icon step-icon-3">
+            <i data-lucide="shield-check"></i>
+          </div>
+          <div class="step-number">03</div>
+          <h3 data-i18n="step3Title">Get Your Verdict</h3>
+          <p data-i18n="step3Desc">Receive a color-coded health score with detailed breakdown and alternatives.</p>
+        </div>
+      </div>
+
+      <button id="btnContinue" class="btn btn-primary" data-i18n="continue">
+        Continue
+        <i data-lucide="arrow-right"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN 3: PRODUCT INPUT ===== -->
+  <section id="inputScreen" class="screen">
+    <div class="screen-content">
+      <button class="btn-back" data-target="howItWorksScreen" aria-label="Go back">
+        <i data-lucide="arrow-left"></i>
+      </button>
+      <h2 class="section-title" data-i18n="analyzeProduct">Analyze a Product</h2>
+      <p class="section-sub" data-i18n="analyzeProductSub">Choose how you want to scan</p>
+
+      <div class="input-tabs">
+        <button class="tab-btn active" data-tab="textTab" id="tabTextBtn">
+          <i data-lucide="type"></i>
+          <span data-i18n="textSearch">Text Search</span>
+        </button>
+        <button class="tab-btn" data-tab="cameraTab" id="tabCameraBtn">
+          <i data-lucide="scan-line"></i>
+          <span data-i18n="cameraUpload">Barcode Scan</span>
+        </button>
+      </div>
+
+      <!-- Text Search Tab -->
+      <div id="textTab" class="tab-content active">
+        <div class="search-box glass-card">
+          <div class="search-input-wrap">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="productSearchInput" placeholder="e.g. Maggi Noodles, Bournvita, Coca-Cola..." data-i18n-placeholder="searchPlaceholder" autocomplete="off">
+            <button id="btnVoiceInput" class="btn-voice" aria-label="Voice input">
+              <i data-lucide="mic"></i>
+            </button>
+          </div>
+          <div id="searchSuggestions" class="search-suggestions"></div>
+        </div>
+      </div>
+
+      <!-- Barcode Scanner Tab -->
+      <div id="cameraTab" class="tab-content">
+        <div class="camera-box glass-card">
+          <!-- Live Scanner Area -->
+          <div class="barcode-scanner-area" id="barcodeScannerArea">
+            <div id="barcodeScannerViewfinder" class="barcode-viewfinder"></div>
+            <div class="barcode-scanner-controls">
+              <button id="btnStartScanner" class="btn-scanner-action" aria-label="Start Scanner">
+                <i data-lucide="scan-line"></i>
+                <span data-i18n="startCamera">Start Camera Scanner</span>
+              </button>
+              <button id="btnStopScanner" class="btn-scanner-action btn-stop-scanner" aria-label="Stop Scanner" style="display:none;">
+                <i data-lucide="x"></i>
+                <span data-i18n="stopCamera">Stop Camera</span>
+              </button>
+            </div>
+            <div class="barcode-upload-divider">
+              <span>or</span>
+            </div>
+            <div class="barcode-upload-row">
+              <button id="btnUploadBarcode" class="btn-scanner-action btn-upload-barcode" aria-label="Upload Barcode Image">
+                <i data-lucide="image"></i>
+                <span data-i18n="uploadBarcode">Upload Barcode Image</span>
+              </button>
+              <input type="file" id="barcodeFileInput" accept="image/*" hidden>
+            </div>
+          </div>
+          <!-- Decoded Barcode Display -->
+          <div id="barcodeResult" class="barcode-result" style="display:none;">
+            <div class="barcode-result-info">
+              <i data-lucide="check-circle" class="barcode-success-icon"></i>
+              <div>
+                <span class="barcode-label" data-i18n="barcodeDetected">Barcode Detected</span>
+                <span id="barcodeValue" class="barcode-value">—</span>
+              </div>
+            </div>
+            <button id="btnClearBarcode" class="btn-clear-barcode" aria-label="Clear barcode">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button id="btnAnalyze" class="btn btn-primary btn-glow" disabled data-i18n="analyzeProduct2">
+        <i data-lucide="zap"></i>
+        Analyze Product
+      </button>
+
+      <!-- History Section -->
+      <div id="historySection" class="history-section" style="display:none;">
+        <h3 class="history-title">
+          <i data-lucide="clock"></i>
+          <span data-i18n="recentScans">Recent Scans</span>
+        </h3>
+        <div id="historyList" class="history-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN 4: LOADING / ANALYSIS ===== -->
+  <section id="loadingScreen" class="screen">
+    <div class="screen-content loading-content">
+      <div class="loading-visual">
+        <div class="dna-helix">
+          <div class="dna-strand"></div>
+          <div class="dna-strand"></div>
+          <div class="dna-strand"></div>
+          <div class="dna-strand"></div>
+          <div class="dna-strand"></div>
+        </div>
+        <div class="scan-ring"></div>
+        <div class="scan-ring scan-ring-2"></div>
+      </div>
+      <h2 class="loading-title" data-i18n="analyzing">Analyzing Product...</h2>
+      <p id="loadingStatus" class="loading-status" data-i18n="fetchingData">Fetching product data from the web...</p>
+      <div class="loading-bar">
+        <div id="loadingProgress" class="loading-bar-fill"></div>
+      </div>
+      <div class="loading-steps">
+        <div class="l-step" id="lstep1">
+          <i data-lucide="globe"></i>
+          <span data-i18n="lStep1">Searching product info</span>
+        </div>
+        <div class="l-step" id="lstep2">
+          <i data-lucide="flask-conical"></i>
+          <span data-i18n="lStep2">Analyzing ingredients</span>
+        </div>
+        <div class="l-step" id="lstep3">
+          <i data-lucide="heart-pulse"></i>
+          <span data-i18n="lStep3">Calculating health score</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN 5: RESULT SUMMARY ===== -->
+  <section id="resultScreen" class="screen">
+    <div class="screen-content">
+      <button class="btn-back" data-target="inputScreen" aria-label="Go back">
+        <i data-lucide="arrow-left"></i>
+      </button>
+
+      <div class="result-hero glass-card">
+        <div id="resultBadge" class="result-badge badge-green">
+          <span id="resultScore" class="result-score">8.5</span>
+          <span class="result-of">/10</span>
+        </div>
+        <h2 id="resultProductName" class="result-product-name">Product Name</h2>
+        <div id="resultVerdict" class="result-verdict verdict-green">
+          <i data-lucide="shield-check"></i>
+          <span>Safe to Consume</span>
+        </div>
+
+        <!-- Traffic Light -->
+        <div class="traffic-light">
+          <div class="tl-light tl-green" id="tlGreen"><span>🟢</span></div>
+          <div class="tl-light tl-yellow" id="tlYellow"><span>🟡</span></div>
+          <div class="tl-light tl-red" id="tlRed"><span>🔴</span></div>
+        </div>
+      </div>
+
+      <!-- Health Scale Bar -->
+      <div class="health-scale glass-card">
+        <h3 data-i18n="healthScale">Health Scale</h3>
+        <div class="scale-bar">
+          <div class="scale-gradient"></div>
+          <div id="scaleMarker" class="scale-marker" style="left: 85%;">
+            <span class="marker-value" id="markerValue">8.5</span>
+          </div>
+        </div>
+        <div class="scale-labels">
+          <span>0 <span data-i18n="avoid">Avoid</span></span>
+          <span>5 <span data-i18n="moderate">Moderate</span></span>
+          <span>10 <span data-i18n="safe">Safe</span></span>
+        </div>
+      </div>
+
+      <!-- Quick Highlights -->
+      <div class="quick-highlights">
+        <div class="highlight-card glass-card" id="hlSugar">
+          <i data-lucide="candy"></i>
+          <span class="hl-label" data-i18n="sugarLevel">Sugar Level</span>
+          <span class="hl-value" id="hlSugarVal">Low</span>
+        </div>
+        <div class="highlight-card glass-card" id="hlProcessing">
+          <i data-lucide="factory"></i>
+          <span class="hl-label" data-i18n="processing">Processing</span>
+          <span class="hl-value" id="hlProcessingVal">Moderate</span>
+        </div>
+        <div class="highlight-card glass-card" id="hlAdditives">
+          <i data-lucide="flask-conical"></i>
+          <span class="hl-label" data-i18n="additives">Additives</span>
+          <span class="hl-value" id="hlAdditivesVal">Few</span>
+        </div>
+      </div>
+
+      <!-- Allergy Alert -->
+      <div id="allergyAlert" class="allergy-alert glass-card" style="display:none;">
+        <i data-lucide="alert-triangle"></i>
+        <div>
+          <h4 data-i18n="allergyWarning">Allergy Warning</h4>
+          <p id="allergyAlertText"></p>
+        </div>
+      </div>
+
+      <button id="btnViewReport" class="btn btn-primary" data-i18n="viewFullReport">
+        <i data-lucide="file-text"></i>
+        View Full Report
+      </button>
+      <button id="btnScanAnother" class="btn btn-secondary" data-i18n="scanAnother">
+        <i data-lucide="refresh-cw"></i>
+        Scan Another Product
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN 6: DETAILED REPORT ===== -->
+  <section id="reportScreen" class="screen">
+    <div class="screen-content">
+      <button class="btn-back" data-target="resultScreen" aria-label="Go back">
+        <i data-lucide="arrow-left"></i>
+      </button>
+      <h2 class="section-title" data-i18n="detailedReport">Detailed Report</h2>
+      <p class="section-sub" id="reportProductSub">for Product Name</p>
+
+      <!-- Report Sections -->
+      <div class="report-sections">
+        <!-- Ingredient Breakdown -->
+        <div class="report-card glass-card">
+          <div class="report-card-header">
+            <i data-lucide="list"></i>
+            <h3 data-i18n="ingredientBreakdown">Ingredient Breakdown</h3>
+          </div>
+          <div id="ingredientList" class="ingredient-list">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Hidden Truth -->
+        <div class="report-card glass-card">
+          <div class="report-card-header">
+            <i data-lucide="eye"></i>
+            <h3 data-i18n="hiddenTruth">The Hidden Truth</h3>
+          </div>
+          <div id="hiddenTruthContent" class="report-text">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Harmful Components -->
+        <div class="report-card glass-card report-card-danger">
+          <div class="report-card-header">
+            <i data-lucide="alert-octagon"></i>
+            <h3 data-i18n="harmfulComponents">Harmful Components</h3>
+          </div>
+          <div id="harmfulList" class="harmful-list">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Sugar & Oil Warning -->
+        <div class="report-card glass-card report-card-warning">
+          <div class="report-card-header">
+            <i data-lucide="droplets"></i>
+            <h3 data-i18n="sugarOilWarning">Sugar & Oil Warning</h3>
+          </div>
+          <div id="sugarOilContent" class="report-text">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Healthier Alternatives -->
+        <div class="report-card glass-card report-card-success">
+          <div class="report-card-header">
+            <i data-lucide="leaf"></i>
+            <h3 data-i18n="alternatives">Healthier Alternatives</h3>
+          </div>
+          <div id="alternativesList" class="alternatives-list">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+      <button id="btnBackToResult" class="btn btn-secondary" data-i18n="backToSummary">
+        <i data-lucide="arrow-left"></i>
+        Back to Summary
+      </button>
+      <button id="btnShareReport" class="btn btn-primary" data-i18n="shareReport">
+        <i data-lucide="share-2"></i>
+        Share Report
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== ABOUT MODAL ===== -->
+  <div id="aboutModal" class="modal" style="display:none;">
+    <div class="modal-content glass-card about-modal-content">
+      <button id="btnCloseAbout" class="about-close" aria-label="Close">
+        <i data-lucide="x"></i>
+      </button>
+
+      <!-- App Info -->
+      <div class="about-app-header">
+        <div class="about-logo">
+          <i data-lucide="scan-eye"></i>
+        </div>
+        <h3>Pure<span class="logo-accent">Scan</span></h3>
+        <p class="about-tagline">Listen to Science, Not Marketing.</p>
+        <span class="about-version">v1.0.0</span>
+      </div>
+
+      <p class="about-desc">PureScan is an AI-powered transparency app that exposes the hidden truth behind misleading food labels and empowers every Indian household to make smarter, healthier decisions.</p>
+
+      <div class="about-divider"></div>
+
+      <!-- Owners -->
+      <div class="about-section">
+        <h4><i data-lucide="crown"></i> Founders</h4>
+        <div class="about-person-card">
+          <div class="about-avatar">SG</div>
+          <div class="about-person-info">
+            <span class="about-person-name">Sundram Goud</span>
+            <a href="mailto:sundramgoud@gmail.com" class="about-link">
+              <i data-lucide="mail"></i> sundramgoud@gmail.com
+            </a>
+            
+          </div>
+        </div>
+        <div class="about-person-card">
+          <div class="about-avatar">US</div>
+          <div class="about-person-info">
+            <span class="about-person-name">Ujwal Singh</span>
+            <a href="tel:+918856851228" class="about-link">
+              <i data-lucide="phone"></i> +91 8856851228
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-divider"></div>
+
+      <!-- Developer -->
+      <div class="about-section">
+        <h4><i data-lucide="code-2"></i> Developer</h4>
+        <div class="about-person-card">
+          <div class="about-avatar dev-avatar">J</div>
+          <div class="about-person-info">
+            <span class="about-person-name">Jaswant</span>
+            <a href="https://instagram.com/jaswant_0707" target="_blank" rel="noopener" class="about-link">
+              <svg class="about-insta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg> @jaswant_0707
+            </a>
+            <a href="mailto:jaswanty132@gmail.com" class="about-link">
+              <i data-lucide="mail"></i> jaswanty132@gmail.com
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-footer">
+        <span>Made with ❤️ in India</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ERROR MODAL ===== -->
+  <div id="errorModal" class="modal" style="display:none;">
+    <div class="modal-content glass-card">
+      <div class="modal-icon-error">
+        <i data-lucide="alert-circle"></i>
+      </div>
+      <h3 data-i18n="oops">Oops!</h3>
+      <p id="errorMessage">Something went wrong. Please try again.</p>
+      <button id="btnCloseError" class="btn btn-primary" data-i18n="tryAgain">Try Again</button>
+    </div>
+  </div>
+
+  <script src="script.js?v=8"></script>
+  <script src="health-modules.js?v=8"></script>
+  <script src="product-images.js?v=8"></script>
+</body>
+</html>
