@@ -16,130 +16,7 @@ const CONFIG = {
 // ==========================================
 // INTERNATIONALIZATION (i18n)
 // ==========================================
-const TRANSLATIONS = {
-  en: {
-    tagline: 'Listen to Science, Not Marketing.',
-    splashDesc: 'Exposing the truth behind misleading food labels and empowering every household to make smarter, healthier decisions.',
-    startScanning: 'Start Scanning',
-    productsScanned: 'Products Scanned',
-    accuracy: 'Accuracy',
-    userRating: 'User Rating',
-    howItWorks: 'How It Works',
-    howItWorksSub: 'Three simple steps to uncover the truth',
-    step1Title: 'Scan Barcode',
-    step1Desc: 'Scan a product barcode using your camera or type the product name to begin analysis.',
-    step2Title: 'AI Analyzes',
-    step2Desc: 'Our AI decodes every ingredient, chemical, and hidden additive in seconds.',
-    step3Title: 'Get Your Verdict',
-    step3Desc: 'Receive a color-coded health score with detailed breakdown and alternatives.',
-    continue: 'Continue',
-    analyzeProduct: 'Analyze a Product',
-    analyzeProductSub: 'Choose how you want to scan',
-    textSearch: 'Text Search',
-    cameraUpload: 'Barcode Scan',
-    searchPlaceholder: 'e.g. Maggi Noodles, Bournvita, Coca-Cola...',
-    startCamera: 'Start Camera Scanner',
-    stopCamera: 'Stop Camera',
-    uploadBarcode: 'Upload Barcode Image',
-    barcodeDetected: 'Barcode Detected',
-    barcodeNotDetected: 'Could not detect a barcode. Please try again with a clearer image.',
-    analyzeProduct2: 'Analyze Product',
-    recentScans: 'Recent Scans',
-    analyzing: 'Analyzing Product...',
-    fetchingData: 'Fetching product data from the web...',
-    lStep1: 'Searching product info',
-    lStep2: 'Analyzing ingredients',
-    lStep3: 'Calculating health score',
-    healthScale: 'Health Scale',
-    avoid: 'Avoid',
-    moderate: 'Moderate',
-    safe: 'Safe',
-    sugarLevel: 'Sugar Level',
-    processing: 'Processing',
-    additives: 'Additives',
-    allergyWarning: 'Allergy Warning',
-    viewFullReport: 'View Full Report',
-    scanAnother: 'Scan Another Product',
-    detailedReport: 'Detailed Report',
-    ingredientBreakdown: 'Ingredient Breakdown',
-    hiddenTruth: 'The Hidden Truth',
-    harmfulComponents: 'Harmful Components',
-    sugarOilWarning: 'Sugar & Oil Warning',
-    alternatives: 'Healthier Alternatives',
-    backToSummary: 'Back to Summary',
-    shareReport: 'Share Report',
-    oops: 'Oops!',
-    tryAgain: 'Try Again',
-    safe_verdict: 'Safe to Consume',
-    moderate_verdict: 'Use with Caution',
-    avoid_verdict: 'Avoid This Product',
-    noResults: 'No results found. Try a different product name.',
-    apiError: 'Could not connect to the analysis service. Please check your internet connection and try again.',
-    voiceNotSupported: 'Voice input is not supported in your browser.',
-    copied: 'Report link copied!',
-  },
-  hi: {
-    tagline: 'विज्ञान सुनो, मार्केटिंग नहीं।',
-    splashDesc: 'भ्रामक खाद्य लेबल की सच्चाई उजागर करना और हर भारतीय परिवार को स्वस्थ निर्णय लेने में सक्षम बनाना।',
-    startScanning: 'स्कैन शुरू करें',
-    productsScanned: 'उत्पाद स्कैन किए',
-    accuracy: 'सटीकता',
-    userRating: 'यूज़र रेटिंग',
-    howItWorks: 'यह कैसे काम करता है',
-    howItWorksSub: 'सच्चाई जानने के तीन आसान कदम',
-    step1Title: 'बारकोड स्कैन करें',
-    step1Desc: 'कैमरे से बारकोड स्कैन करें या उत्पाद का नाम टाइप करें।',
-    step2Title: 'AI विश्लेषण',
-    step2Desc: 'हमारा AI हर सामग्री, रसायन और छिपे एडिटिव को सेकंडों में डिकोड करता है।',
-    step3Title: 'अपना फैसला पाएं',
-    step3Desc: 'रंग-कोडित स्वास्थ्य स्कोर, विस्तृत विश्लेषण और विकल्प प्राप्त करें।',
-    continue: 'जारी रखें',
-    analyzeProduct: 'उत्पाद का विश्लेषण करें',
-    analyzeProductSub: 'स्कैन का तरीका चुनें',
-    textSearch: 'टेक्स्ट खोज',
-    cameraUpload: 'बारकोड स्कैन',
-    searchPlaceholder: 'जैसे मैगी नूडल्स, बॉर्नविटा, कोका-कोला...',
-    startCamera: 'कैमरा स्कैनर शुरू करें',
-    stopCamera: 'कैमरा बंद करें',
-    uploadBarcode: 'बारकोड इमेज अपलोड करें',
-    barcodeDetected: 'बारकोड पहचाना गया',
-    barcodeNotDetected: 'बारकोड नहीं मिला। कृपया स्पष्ट छवि से पुनः प्रयास करें।',
-    analyzeProduct2: 'उत्पाद का विश्लेषण',
-    recentScans: 'हाल के स्कैन',
-    analyzing: 'उत्पाद का विश्लेषण हो रहा है...',
-    fetchingData: 'वेब से उत्पाद डेटा लाया जा रहा है...',
-    lStep1: 'उत्पाद जानकारी खोज रहे हैं',
-    lStep2: 'सामग्री का विश्लेषण',
-    lStep3: 'स्वास्थ्य स्कोर की गणना',
-    healthScale: 'स्वास्थ्य स्केल',
-    avoid: 'बचें',
-    moderate: 'सावधानी',
-    safe: 'सुरक्षित',
-    sugarLevel: 'शुगर स्तर',
-    processing: 'प्रोसेसिंग',
-    additives: 'एडिटिव्स',
-    allergyWarning: 'एलर्जी चेतावनी',
-    viewFullReport: 'पूरी रिपोर्ट देखें',
-    scanAnother: 'दूसरा उत्पाद स्कैन करें',
-    detailedReport: 'विस्तृत रिपोर्ट',
-    ingredientBreakdown: 'सामग्री विश्लेषण',
-    hiddenTruth: 'छिपी सच्चाई',
-    harmfulComponents: 'हानिकारक तत्व',
-    sugarOilWarning: 'शुगर और तेल चेतावनी',
-    alternatives: 'स्वस्थ विकल्प',
-    backToSummary: 'सारांश पर वापस',
-    shareReport: 'रिपोर्ट शेयर करें',
-    oops: 'ओह!',
-    tryAgain: 'फिर कोशिश करें',
-    safe_verdict: 'सेवन के लिए सुरक्षित',
-    moderate_verdict: 'सावधानी से उपयोग करें',
-    avoid_verdict: 'इस उत्पाद से बचें',
-    noResults: 'कोई परिणाम नहीं मिला। अलग उत्पाद नाम आज़माएं।',
-    apiError: 'विश्लेषण सेवा से कनेक्ट नहीं हो सका। कृपया इंटरनेट कनेक्शन जांचें।',
-    voiceNotSupported: 'आपके ब्राउज़र में वॉइस इनपुट समर्थित नहीं है।',
-    copied: 'रिपोर्ट लिंक कॉपी हुआ!',
-  }
-};
+// TRANSLATIONS object is now loaded from translations.js
 
 // ==========================================
 // APPLICATION STATE
@@ -155,6 +32,21 @@ const AppState = {
   barcodeScanner: null,
   isScannerRunning: false,
   isAnalyzing: false,
+};
+
+// Language code → English name map for AI prompt injection
+const LANG_CODE_TO_NAME = {
+  'en': 'English',
+  'hi': 'Hindi',
+  'hinglish': 'Hinglish',
+  'mr': 'Marathi',
+  'gu': 'Gujarati',
+  'ta': 'Tamil',
+  'te': 'Telugu',
+  'bn': 'Bengali',
+  'kn': 'Kannada',
+  'ml': 'Malayalam',
+  'pa': 'Punjabi'
 };
 
 // ==========================================
@@ -243,6 +135,11 @@ function cacheDOMElements() {
   DOM.aboutModal = document.getElementById('aboutModal');
   DOM.btnCloseAbout = document.getElementById('btnCloseAbout');
 
+  // Language Modal
+  DOM.languageModal = document.getElementById('languageModal');
+  DOM.btnCloseLanguage = document.getElementById('btnCloseLanguage');
+  DOM.languageGrid = document.getElementById('languageGrid');
+
   // Back buttons
   DOM.backBtns = document.querySelectorAll('.btn-back');
 }
@@ -317,39 +214,138 @@ function initLanguage() {
   if (saved) {
     AppState.currentLang = saved;
   }
+  
+  // Populate Language Grid
+  const langInfos = [
+    { code: 'en', name: 'English' },
+    { code: 'hi', name: 'हिंदी' },
+    { code: 'hinglish', name: 'Hinglish' },
+    { code: 'mr', name: 'मराठी' },
+    { code: 'gu', name: 'ગુજરાતી' },
+    { code: 'ta', name: 'தமிழ்' },
+    { code: 'te', name: 'తెలుగు' },
+    { code: 'bn', name: 'বাংলা' },
+    { code: 'kn', name: 'ಕನ್ನಡ' },
+    { code: 'ml', name: 'മലയാളം' },
+    { code: 'pa', name: 'ਪੰਜਾਬੀ' }
+  ];
+  
+  DOM.languageGrid.innerHTML = langInfos.map(lang => `
+    <button class="lang-btn ${AppState.currentLang === lang.code ? 'active' : ''}" data-lang-code="${lang.code}">
+      <span class="lang-btn-name">${lang.name}</span>
+      <span class="lang-btn-code">${lang.code}</span>
+    </button>
+  `).join('');
+
+  DOM.languageGrid.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      setLanguage(btn.getAttribute('data-lang-code'));
+      hideLanguageModal();
+    });
+  });
+
   applyLanguage();
 }
 
-function toggleLanguage() {
-  AppState.currentLang = AppState.currentLang === 'en' ? 'hi' : 'en';
+function showLanguageModal() {
+  DOM.languageModal.style.display = 'flex';
+  if (window.lucide) lucide.createIcons();
+}
+
+function hideLanguageModal() {
+  DOM.languageModal.style.display = 'none';
+}
+
+async function setLanguage(langCode) {
+  if (AppState.currentLang === langCode) return;
+  
+  AppState.currentLang = langCode;
   localStorage.setItem(CONFIG.LANG_KEY, AppState.currentLang);
+  
+  // Update UI active state
+  DOM.languageGrid.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-lang-code') === langCode);
+  });
+  
   applyLanguage();
+
+  // Handle dynamic translation for results screen instantly
+  if ((AppState.currentScreen === 'resultScreen' || AppState.currentScreen === 'reportScreen') && AppState.analysisResult) {
+    await translateCurrentAnalysis(langCode);
+  }
+}
+
+async function translateCurrentAnalysis(targetLanguage) {
+  // Show localized loader on screen
+  navigateTo('loadingScreen');
+  resetLoadingUI();
+  updateLoadingStep(1, 'done', 33);
+  updateLoadingStep(2, 'active', 66);
+  DOM.loadingStatus.textContent = t('analyzing');
+
+  try {
+    const finalLang = LANG_CODE_TO_NAME[targetLanguage] || 'English';
+
+    const response = await fetch('/.netlify/functions/translate-data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        targetLanguage: finalLang,
+        analysisData: AppState.analysisResult
+      })
+    });
+    
+    if(!response.ok) throw new Error('Translation failed');
+    const translated = await response.json();
+    AppState.analysisResult = translated;
+    
+    // update cache with the NEW language
+    const cacheKey = AppState.productName.toLowerCase().trim() + '_' + targetLanguage;
+    try {
+      const store = JSON.parse(localStorage.getItem('ps_analysis_cache') || '{}');
+      store[cacheKey] = translated;
+      localStorage.setItem('ps_analysis_cache', JSON.stringify(store));
+    } catch(e) {}
+    
+  } catch(e) {
+    console.error('Dynamic translation failed:', e);
+  }
+  
+  // Restore screen
+  displayResults(AppState.analysisResult);
+  navigateTo('resultScreen');
 }
 
 function applyLanguage() {
   const lang = AppState.currentLang;
-  const t = TRANSLATIONS[lang];
-  DOM.langLabel.textContent = lang.toUpperCase();
+  const tVals = TRANSLATIONS[lang] || TRANSLATIONS.en;
+  let labelCode = lang === 'hinglish' ? 'HI-EN' : lang.toUpperCase();
+  DOM.langLabel.textContent = labelCode;
 
   // Update all i18n elements
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    if (t[key]) {
-      el.textContent = t[key];
+    if (tVals[key]) {
+      el.innerHTML = tVals[key];
     }
   });
 
   // Update placeholders
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.getAttribute('data-i18n-placeholder');
-    if (t[key]) {
-      el.placeholder = t[key];
+    if (tVals[key]) {
+      el.placeholder = tVals[key];
     }
   });
+
+  // Notify health-modules and other plugins of language change
+  if (typeof window.onPureScanLanguageChange === 'function') {
+    window.onPureScanLanguageChange(lang);
+  }
 }
 
 function t(key) {
-  return TRANSLATIONS[AppState.currentLang][key] || TRANSLATIONS.en[key] || key;
+  return (TRANSLATIONS[AppState.currentLang] && TRANSLATIONS[AppState.currentLang][key]) || TRANSLATIONS.en[key] || key;
 }
 
 // ==========================================
@@ -750,7 +746,7 @@ async function startAnalysis() {
   resetLoadingUI();
 
   try {
-    const cacheKey = AppState.productName.toLowerCase().trim();
+    const cacheKey = AppState.productName.toLowerCase().trim() + '_' + AppState.currentLang;
     let analysis = null;
 
     try {
@@ -773,11 +769,13 @@ async function startAnalysis() {
       updateLoadingStep(1, 'active', 30);
       DOM.loadingStatus.textContent = t('fetchingData');
 
+      const targetLangName = LANG_CODE_TO_NAME[AppState.currentLang] || 'English';
+
       // Call secure Netlify serverless function
       const response = await fetch('/.netlify/functions/analyze-product', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productName: AppState.productName })
+        body: JSON.stringify({ productName: AppState.productName, targetLanguage: targetLangName })
       });
 
       updateLoadingStep(1, 'done', 50);
@@ -1180,7 +1178,13 @@ function hideAbout() {
 function bindEvents() {
   // Theme & Language
   DOM.themeToggle.addEventListener('click', toggleTheme);
-  DOM.langToggle.addEventListener('click', toggleLanguage);
+  DOM.langToggle.addEventListener('click', showLanguageModal);
+
+  // Language Modal events
+  DOM.btnCloseLanguage.addEventListener('click', hideLanguageModal);
+  DOM.languageModal.addEventListener('click', (e) => {
+    if (e.target === DOM.languageModal) hideLanguageModal();
+  });
 
   // Navigation
   DOM.btnStartScanning.addEventListener('click', () => navigateTo('howItWorksScreen'));

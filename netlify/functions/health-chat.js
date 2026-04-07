@@ -48,7 +48,6 @@ IMPORTANT RULES:
 - Never prescribe medication
 - Never diagnose medical conditions
 - Always recommend consulting a healthcare professional for serious concerns
-- Be encouraging and positive
 - Make health advice practical and affordable for Indian households
 - If a barcode number is provided in the message, use the search context to identify and analyze the product`;
 
@@ -77,7 +76,7 @@ async function searchWeb(query) {
   return null;
 }
 
-async function chatWithAI(userMessage, conversationContext) {
+async function chatWithAI(userMessage, conversationContext, targetLanguage = "English") {
   let searchContext = '';
 
   // If message contains a barcode-like pattern, search for product info
@@ -94,8 +93,16 @@ async function chatWithAI(userMessage, conversationContext) {
     }
   }
 
+  const dynamicSystemPrompt = `${SYSTEM_PROMPT}
+
+🔥 STRICT LANGUAGE RULE: 
+You MUST respond EXCLUSIVELY in ${targetLanguage}.
+Do NOT use ANY English text unless it's a brand/product name.
+If ${targetLanguage} === "Hinglish", write pure Hindi using exact English alphabets (e.g., "High sugar hai, isliye isko avoid karna behtar hai").
+THIS IS MANDATORY. NO MIXED LANGUAGES ALLOWED.`;
+
   const messages = [
-    { role: 'system', content: SYSTEM_PROMPT }
+    { role: 'system', content: dynamicSystemPrompt }
   ];
 
   // Add conversation context (last few messages)
@@ -112,9 +119,13 @@ async function chatWithAI(userMessage, conversationContext) {
   }
 
   // Add current user message with search context if available
-  const finalMessage = searchContext 
+  let finalMessage = searchContext 
     ? `${userMessage}\n\n${searchContext}`
     : userMessage;
+  // Failsafe: reinforce language in user message too
+  if (targetLanguage !== 'English') {
+    finalMessage += `\n\n⚠️ IMPORTANT: Respond STRICTLY in ${targetLanguage} only. No English allowed except brand/product names.`;
+  }
   messages.push({ role: 'user', content: finalMessage });
 
   const keys = getGroqKeys();
@@ -180,7 +191,7 @@ exports.handler = async function (event) {
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const { message, context } = body;
+    const { message, context, targetLanguage = 'English' } = body;
 
     if (!message) {
       return {
@@ -194,7 +205,7 @@ exports.handler = async function (event) {
 
     console.log(`[HealthChat] User: ${cleanMessage.substring(0, 100)}...`);
 
-    const reply = await chatWithAI(cleanMessage, context);
+    const reply = await chatWithAI(cleanMessage, context, targetLanguage);
 
     if (!reply) {
       return {

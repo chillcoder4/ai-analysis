@@ -53,9 +53,9 @@
         <p class="tagline" data-i18n="tagline">PROTOTYPE <br> Listen to Science, Not Marketing.</p>
       </div>
       <p class="splash-desc" data-i18n="splashDesc">Exposing the truth behind misleading food labels and empowering every household to make smarter, healthier decisions.</p>
-      <button id="btnStartScanning" class="btn btn-primary btn-glow" data-i18n="startScanning">
+      <button id="btnStartScanning" class="btn btn-primary btn-glow">
         <i data-lucide="arrow-right"></i>
-        Start Scanning
+        <span data-i18n="startScanning">Start Scanning</span>
       </button>
       <div class="splash-stats">
         <div class="stat-item">
@@ -115,8 +115,8 @@
         </div>
       </div>
 
-      <button id="btnContinue" class="btn btn-primary" data-i18n="continue">
-        Continue
+      <button id="btnContinue" class="btn btn-primary">
+        <span data-i18n="continue">Continue</span>
         <i data-lucide="arrow-right"></i>
       </button>
     </div>
@@ -173,7 +173,7 @@
               </button>
             </div>
             <div class="barcode-upload-divider">
-              <span>or</span>
+              <span data-i18n="or">or</span>
             </div>
             <div class="barcode-upload-row">
               <button id="btnUploadBarcode" class="btn-scanner-action btn-upload-barcode" aria-label="Upload Barcode Image">
@@ -199,9 +199,9 @@
         </div>
       </div>
 
-      <button id="btnAnalyze" class="btn btn-primary btn-glow" disabled data-i18n="analyzeProduct2">
+      <button id="btnAnalyze" class="btn btn-primary btn-glow" disabled>
         <i data-lucide="zap"></i>
-        Analyze Product
+        <span data-i18n="analyzeProduct2">Analyze Product</span>
       </button>
 
       <!-- History Section -->
@@ -266,7 +266,7 @@
         <h2 id="resultProductName" class="result-product-name">Product Name</h2>
         <div id="resultVerdict" class="result-verdict verdict-green">
           <i data-lucide="shield-check"></i>
-          <span>Safe to Consume</span>
+          <span data-i18n="safe_verdict">Safe to Consume</span>
         </div>
 
         <!-- Traffic Light -->
@@ -321,13 +321,13 @@
         </div>
       </div>
 
-      <button id="btnViewReport" class="btn btn-primary" data-i18n="viewFullReport">
+      <button id="btnViewReport" class="btn btn-primary">
         <i data-lucide="file-text"></i>
-        View Full Report
+        <span data-i18n="viewFullReport">View Full Report</span>
       </button>
-      <button id="btnScanAnother" class="btn btn-secondary" data-i18n="scanAnother">
+      <button id="btnScanAnother" class="btn btn-secondary">
         <i data-lucide="refresh-cw"></i>
-        Scan Another Product
+        <span data-i18n="scanAnother">Scan Another Product</span>
       </button>
     </div>
   </section>
@@ -389,13 +389,13 @@
 
       </div>
 
-      <button id="btnBackToResult" class="btn btn-secondary" data-i18n="backToSummary">
+      <button id="btnBackToResult" class="btn btn-secondary">
         <i data-lucide="arrow-left"></i>
-        Back to Summary
+        <span data-i18n="backToSummary">Back to Summary</span>
       </button>
-      <button id="btnShareReport" class="btn btn-primary" data-i18n="shareReport">
+      <button id="btnShareReport" class="btn btn-primary">
         <i data-lucide="share-2"></i>
-        Share Report
+        <span data-i18n="shareReport">Share Report</span>
       </button>
     </div>
   </section>
@@ -413,17 +413,17 @@
           <i data-lucide="scan-eye"></i>
         </div>
         <h3>Pure<span class="logo-accent">Scan</span></h3>
-        <p class="about-tagline">Listen to Science, Not Marketing.</p>
+        <p class="about-tagline" data-i18n="aboutTagline">Listen to Science, Not Marketing.</p>
         <span class="about-version">v1.0.0</span>
       </div>
 
-      <p class="about-desc">PureScan is an AI-powered transparency app that exposes the hidden truth behind misleading food labels and empowers every Indian household to make smarter, healthier decisions.</p>
+      <p class="about-desc" data-i18n="aboutDesc">PureScan is an AI-powered transparency app that exposes the hidden truth behind misleading food labels and empowers every Indian household to make smarter, healthier decisions.</p>
 
       <div class="about-divider"></div>
 
       <!-- Owners -->
       <div class="about-section">
-        <h4><i data-lucide="crown"></i> Founders</h4>
+        <h4><i data-lucide="crown"></i> <span data-i18n="founders">Founders</span></h4>
         <div class="about-person-card">
           <div class="about-avatar">SG</div>
           <div class="about-person-info">
@@ -449,7 +449,7 @@
 
       <!-- Developer -->
       <div class="about-section">
-        <h4><i data-lucide="code-2"></i> Developer</h4>
+        <h4><i data-lucide="code-2"></i> <span data-i18n="developer">Developer</span></h4>
         <div class="about-person-card">
           <div class="about-avatar dev-avatar">J</div>
           <div class="about-person-info">
@@ -465,7 +465,22 @@
       </div>
 
       <div class="about-footer">
-        <span>Made with ❤️ in India</span>
+        <span data-i18n="madeWithLove">Made with ❤️ in India</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LANGUAGE MODAL ===== -->
+  <div id="languageModal" class="modal" style="display:none;">
+    <div class="modal-content glass-card language-modal-content">
+      <div class="modal-header-flex">
+        <h3><i data-lucide="languages"></i> Select Language</h3>
+        <button id="btnCloseLanguage" class="about-close" aria-label="Close">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="language-grid" id="languageGrid">
+        <!-- dynamically populated -->
       </div>
     </div>
   </div>
@@ -482,6 +497,7 @@
     </div>
   </div>
 
+  <script src="translations.js?v=8"></script>
   <script src="script.js?v=8"></script>
   <script src="health-modules.js?v=8"></script>
   <script src="product-images.js?v=8"></script>

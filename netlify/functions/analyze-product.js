@@ -85,7 +85,7 @@ async function searchProduct(productName) {
 // ==========================================
 // GROQ AI ANALYSIS (with 5-key failover)
 // ==========================================
-async function analyzeWithAI(productName, searchData) {
+async function analyzeWithAI(productName, searchData, targetLanguage) {
   // Build context from search results
   let context = '';
   if (searchData) {
@@ -112,10 +112,14 @@ You MUST respond with ONLY valid JSON (no markdown, no code blocks, no extra tex
   "productName": "Full product name",
   "healthScore": <number 0-10, one decimal>,
   "verdict": "Safe" | "Moderate" | "Avoid",
+  "verdictTranslated": "Translated verdict string in target language",
   "shortSummary": "One sentence summary of overall assessment",
   "sugarLevel": "None" | "Low" | "Moderate" | "High" | "Very High",
+  "sugarLevelTranslated": "Translated sugar level",
   "processingLevel": "Minimal" | "Moderate" | "High" | "Ultra-Processed",
+  "processingLevelTranslated": "Translated processing level",
   "additivesLevel": "None" | "Few" | "Several" | "Many",
+  "additivesLevelTranslated": "Translated additives level",
   "ingredients": [
     {
       "name": "Ingredient name",
@@ -168,7 +172,13 @@ IMPORTANT RULES:
 - Focus on the Indian market context
 - Do NOT be lenient — expose marketing tricks honestly
 - Include at least 5 ingredients in the breakdown
-- If a barcode number is provided, identify the product from the search results and analyze it`;
+- If a barcode number is provided, identify the product from the search results and analyze it
+
+🔥 STRICT LANGUAGE RULE: 
+You MUST respond EXCLUSIVELY in ${targetLanguage}.
+If ${targetLanguage} = "Hinglish", write pure Hindi using exact English alphabets (e.g., "High sugar hai, isliye isko avoid karna behtar hai").
+CRITICAL UI CONSTRAINT: The exact string values for 'verdict', 'sugarLevel', 'processingLevel', and 'additivesLevel' MUST remain strictly in English (e.g. "Safe", "Moderate", "Avoid", "High", "Ultra-Processed" etc.) because our frontend code depends on these strict English enums. 
+DO NOT translate those 4 specific fields. YOU MUST translate all other descriptive fields (shortSummary, hiddenTruth, ingredients, harmfulComponents, alternatives, etc.) completely into ${targetLanguage}. THIS IS MANDATORY. NO MIXED LANGUAGES ALLOWED IN THE PROSE.`;
 
   const userMessage = `Analyze this product: "${productName}"
 
@@ -176,7 +186,8 @@ Here is information gathered from the web about this product:
 
 ${context || 'No web data available — use your knowledge base.'}
 
-Provide a thorough ingredient analysis, health score, and hidden truth report. Remember to output ONLY valid JSON.`;
+Provide a thorough ingredient analysis, health score, and hidden truth report. Remember to output ONLY valid JSON.
+⚠️ LANGUAGE REMINDER: Your ENTIRE response MUST be in ${targetLanguage}. Do NOT use English for any descriptive text. Only product/brand names may remain in English.`;
 
   const keys = getGroqKeys();
   const errors = [];
@@ -250,7 +261,7 @@ exports.handler = async function (event) {
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const { productName } = body;
+    const { productName, targetLanguage = 'English' } = body;
 
     if (!productName || typeof productName !== 'string' || productName.trim().length === 0) {
       return {
@@ -268,7 +279,7 @@ exports.handler = async function (event) {
 
     // Step 2: Analyze with GROQ AI
     console.log(`[PureScan] Analyzing with AI...`);
-    const analysis = await analyzeWithAI(cleanName, searchData);
+    const analysis = await analyzeWithAI(cleanName, searchData, targetLanguage);
 
     if (!analysis) {
       return {
