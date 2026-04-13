@@ -1176,6 +1176,23 @@ function hideAbout() {
 // EVENT BINDINGS
 // ==========================================
 function bindEvents() {
+  // Settings Dropdown
+  const settingsContainer = document.getElementById('settingsContainer');
+  const settingsToggle = document.getElementById('settingsToggle');
+  if (settingsToggle && settingsContainer) {
+    settingsToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      settingsContainer.classList.toggle('open');
+      settingsToggle.classList.toggle('active');
+    });
+    document.addEventListener('click', (e) => {
+      if (!settingsContainer.contains(e.target)) {
+        settingsContainer.classList.remove('open');
+        settingsToggle.classList.remove('active');
+      }
+    });
+  }
+
   // Theme & Language
   DOM.themeToggle.addEventListener('click', toggleTheme);
   DOM.langToggle.addEventListener('click', showLanguageModal);
@@ -1189,6 +1206,7 @@ function bindEvents() {
   // Navigation
   DOM.btnStartScanning.addEventListener('click', () => navigateTo('howItWorksScreen'));
   DOM.btnContinue.addEventListener('click', () => {
+    localStorage.setItem('ps_onboarded', '1');
     navigateTo('inputScreen');
     renderHistory();
   });
@@ -1245,10 +1263,19 @@ function init() {
     lucide.createIcons();
   }
 
-  // Show splash with a micro delay for smooth entry
-  setTimeout(() => {
-    document.getElementById('splashScreen').classList.add('active');
-  }, 100);
+  // Check if user has visited before
+  const hasVisited = localStorage.getItem('ps_onboarded');
+
+  if (hasVisited) {
+    // Returning user → skip splash & how-it-works, go direct to home
+    navigateTo('inputScreen');
+    renderHistory();
+  } else {
+    // First-time user → show full onboarding flow
+    setTimeout(() => {
+      document.getElementById('splashScreen').classList.add('active');
+    }, 100);
+  }
 }
 
 // Start the app when DOM is ready

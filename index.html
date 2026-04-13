@@ -19,27 +19,41 @@
   <!-- Html5-QrCode Barcode Scanner -->
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
-  <link rel="stylesheet" href="style.css?v=7">
-  <link rel="stylesheet" href="health-modules.css?v=7">
-  <link rel="stylesheet" href="product-images.css?v=7">
+  <link rel="stylesheet" href="css/style.css?v=8">
+  <link rel="stylesheet" href="css/health-modules.css?v=8">
+  <link rel="stylesheet" href="css/product-images.css?v=8">
 </head>
 <body>
 
-  <!-- ===== THEME TOGGLE ===== -->
-  <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
-    <i data-lucide="moon" class="theme-icon-dark"></i>
-    <i data-lucide="sun" class="theme-icon-light"></i>
-  </button>
-
-  <!-- ===== ABOUT BUTTON ===== -->
-  <button id="aboutToggle" class="about-toggle" aria-label="About PureScan">
-    <i data-lucide="info"></i>
-  </button>
-
-  <!-- ===== LANGUAGE TOGGLE ===== -->
-  <button id="langToggle" class="lang-toggle" aria-label="Toggle language">
-    <span id="langLabel">EN</span>
-  </button>
+  <!-- ===== SETTINGS MENU ===== -->
+  <div class="settings-container" id="settingsContainer">
+    <button id="settingsToggle" class="settings-toggle" aria-label="Settings Menu">
+      <i data-lucide="settings"></i>
+    </button>
+    <div id="settingsDropdown" class="settings-dropdown">
+      <button id="themeToggle" class="dropdown-item" aria-label="Toggle theme">
+        <i data-lucide="moon" class="theme-icon-dark"></i>
+        <i data-lucide="sun" class="theme-icon-light"></i>
+        <span data-i18n="theme">Theme</span>
+      </button>
+      <button id="langToggle" class="dropdown-item" aria-label="Toggle language">
+        <i data-lucide="languages"></i>
+        <span><span data-i18n="language">Language</span> (<span id="langLabel">EN</span>)</span>
+      </button>
+      <button class="dropdown-item dropdown-item-disabled" aria-label="UI Select">
+        <i data-lucide="layout-template"></i>
+        <span class="dropdown-ui-label">
+          <span data-i18n="uiSelect">Default UI</span>
+          <span class="dropdown-coming-soon" data-i18n="comingSoon">Coming Soon</span>
+        </span>
+      </button>
+      <div class="dropdown-divider"></div>
+      <button id="aboutToggle" class="dropdown-item" aria-label="About PureScan">
+        <i data-lucide="info"></i>
+        <span data-i18n="about">About</span>
+      </button>
+    </div>
+  </div>
 
   <!-- ===== SCREEN 1: SPLASH / LANDING ===== -->
   <section id="splashScreen" class="screen active">
@@ -497,10 +511,10 @@
     </div>
   </div>
 
-  <script src="translations.js?v=11"></script>
-  <script src="script.js?v=11"></script>
-  <script src="health-modules.js?v=11"></script>
-  <script src="product-images.js?v=11"></script>
-  <script src="system-rec.js?v=11"></script>
+  <script src="js/translations.js?v=12"></script>
+  <script src="js/script.js?v=12"></script>
+  <script src="js/health-modules.js?v=12"></script>
+  <script src="js/product-images.js?v=12"></script>
+  <script src="js/system-rec.js?v=12"></script>
 </body>
 </html>

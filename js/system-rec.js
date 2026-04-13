@@ -14,7 +14,7 @@
 // ──────────────────────────────────────────────
 // 1. GLOBAL ON/OFF SWITCH
 // ──────────────────────────────────────────────
-const SYSRECTION_ENABLED = true;   // ← Change to false to hide all sysrections instantly
+const SYSRECTION_ENABLED = false;   // ← Change to false to hide all sysrections instantly
 
 
 // ──────────────────────────────────────────────
