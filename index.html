@@ -22,6 +22,10 @@
   <link rel="stylesheet" href="css/style.css?v=8">
   <link rel="stylesheet" href="css/health-modules.css?v=8">
   <link rel="stylesheet" href="css/product-images.css?v=8">
+  
+  <!-- AI Generated Themes -->
+  <link rel="stylesheet" href="css/themes/neumorphic.css">
+  <link rel="stylesheet" href="css/themes/vibrant-glass.css">
 </head>
 <body>
 
@@ -40,11 +44,11 @@
         <i data-lucide="languages"></i>
         <span><span data-i18n="language">Language</span> (<span id="langLabel">EN</span>)</span>
       </button>
-      <button class="dropdown-item dropdown-item-disabled" aria-label="UI Select">
+      <button id="uiSelectToggle" class="dropdown-item" aria-label="UI Select">
         <i data-lucide="layout-template"></i>
         <span class="dropdown-ui-label">
-          <span data-i18n="uiSelect">Default UI</span>
-          <span class="dropdown-coming-soon" data-i18n="comingSoon">Coming Soon</span>
+          <span data-i18n="uiSelect">UI Select</span>
+          <span class="dropdown-coming-soon" style="color:var(--text-muted);">Coming Soon</span>
         </span>
       </button>
       <div class="dropdown-divider"></div>
@@ -508,6 +512,47 @@
       <h3 data-i18n="oops">Oops!</h3>
       <p id="errorMessage">Something went wrong. Please try again.</p>
       <button id="btnCloseError" class="btn btn-primary" data-i18n="tryAgain">Try Again</button>
+    </div>
+  </div>
+
+  <!-- ===== UI SELECT MODAL ===== -->
+  <div id="uiSelectModal" class="modal" style="display:none;">
+    <div class="modal-content about-modal-content" style="max-width: 320px;">
+      <div class="modal-header-flex">
+        <h3><i data-lucide="palette"></i> <span data-i18n="uiSelect">UI Select</span></h3>
+        <button id="btnCloseUiSelect" class="ps-barcode-modal-close" aria-label="Close">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="language-grid" style="grid-template-columns: 1fr;">
+        <button class="lang-btn active ui-theme-btn" data-theme-val="default">
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <i data-lucide="layers"></i>
+            <div>
+              <div class="lang-btn-name">Default Glass</div>
+              <div class="lang-btn-code">Standard</div>
+            </div>
+          </div>
+        </button>
+        <button class="lang-btn ui-theme-btn" data-theme-val="neumorphic">
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <i data-lucide="box"></i>
+            <div>
+              <div class="lang-btn-name">Neumorphic 3D</div>
+              <div class="lang-btn-code">Physical Shadows</div>
+            </div>
+          </div>
+        </button>
+        <button class="lang-btn ui-theme-btn" data-theme-val="vibrant">
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <i data-lucide="sparkles"></i>
+            <div>
+              <div class="lang-btn-name">Vibrant Glass</div>
+              <div class="lang-btn-code">Motion Animated</div>
+            </div>
+          </div>
+        </button>
+      </div>
     </div>
   </div>
 

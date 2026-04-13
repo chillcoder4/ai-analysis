@@ -142,6 +142,12 @@ function cacheDOMElements() {
 
   // Back buttons
   DOM.backBtns = document.querySelectorAll('.btn-back');
+
+  // UI Select
+  DOM.uiSelectToggle = document.getElementById('uiSelectToggle');
+  DOM.uiSelectModal = document.getElementById('uiSelectModal');
+  DOM.btnCloseUiSelect = document.getElementById('btnCloseUiSelect');
+  DOM.uiThemeBtns = document.querySelectorAll('.ui-theme-btn');
 }
 
 // ==========================================
@@ -197,6 +203,24 @@ function initTheme() {
     AppState.currentTheme = saved;
   }
   document.documentElement.setAttribute('data-theme', AppState.currentTheme);
+}
+
+function initUITheme() {
+  const savedUI = localStorage.getItem('ps_custom_ui') || 'default';
+  document.documentElement.setAttribute('data-ui-theme', savedUI);
+  
+  if (DOM.uiThemeBtns) {
+    DOM.uiThemeBtns.forEach(b => b.classList.remove('active'));
+    const activeBtn = document.querySelector(`.ui-theme-btn[data-theme-val="${savedUI}"]`);
+    if (activeBtn) activeBtn.classList.add('active');
+  }
+  
+  const activeLabel = document.getElementById('activeUiLabel');
+  if (activeLabel) {
+    if (savedUI === 'neumorphic') activeLabel.textContent = 'Neumorphic 3D';
+    else if (savedUI === 'vibrant') activeLabel.textContent = 'Vibrant Glass';
+    else activeLabel.textContent = 'Default Glass';
+  }
 }
 
 function toggleTheme() {
@@ -1203,6 +1227,46 @@ function bindEvents() {
     if (e.target === DOM.languageModal) hideLanguageModal();
   });
 
+  // UI Select Modal events
+  if (DOM.uiSelectToggle && DOM.uiSelectModal) {
+    DOM.uiSelectToggle.addEventListener('click', () => {
+      DOM.uiSelectModal.style.display = 'flex';
+      if (window.lucide) lucide.createIcons();
+    });
+    DOM.btnCloseUiSelect.addEventListener('click', () => {
+      DOM.uiSelectModal.style.display = 'none';
+    });
+    DOM.uiSelectModal.addEventListener('click', (e) => {
+      if (e.target === DOM.uiSelectModal) DOM.uiSelectModal.style.display = 'none';
+    });
+    // Handle theme switching
+    DOM.uiThemeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const themeVal = btn.getAttribute('data-theme-val');
+        
+        // Update LocalStorage
+        localStorage.setItem('ps_custom_ui', themeVal);
+        
+        // Update DOM
+        document.documentElement.setAttribute('data-ui-theme', themeVal);
+        
+        // Update Active Button State
+        DOM.uiThemeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Update Dropdown Label
+        const activeLabel = document.getElementById('activeUiLabel');
+        if (activeLabel) {
+          if (themeVal === 'neumorphic') activeLabel.textContent = 'Neumorphic 3D';
+          else if (themeVal === 'vibrant') activeLabel.textContent = 'Vibrant Glass';
+          else activeLabel.textContent = 'Default Glass';
+        }
+        
+        DOM.uiSelectModal.style.display = 'none';
+      });
+    });
+  }
+
   // Navigation
   DOM.btnStartScanning.addEventListener('click', () => navigateTo('howItWorksScreen'));
   DOM.btnContinue.addEventListener('click', () => {
@@ -1251,6 +1315,7 @@ function bindEvents() {
 function init() {
   cacheDOMElements();
   initTheme();
+  initUITheme();
   initLanguage();
   initTabs();
   initSearchSuggestions();
